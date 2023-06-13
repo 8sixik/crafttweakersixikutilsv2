@@ -1,0 +1,153 @@
+buildscript {
+    repositories {
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+    }
+}
+
+plugins {
+    id 'net.minecraftforge.gradle' version '5.1.+'
+}
+
+apply plugin: 'org.spongepowered.mixin'
+
+group = 'net.sixik'
+version = '0.0.1'
+
+java {
+    archivesBaseName = 'crafttweakersixikutils'
+    toolchain.languageVersion = JavaLanguageVersion.of(17)
+}
+
+minecraft {
+
+    mappings channel: 'official', version: '1.19.2'
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+
+
+            property 'forge.logging.markers', 'REGISTRIES'
+
+
+
+            property 'forge.logging.console.level', 'debug'
+
+            property 'forge.enabledGameTestNamespaces', 'crafttweakersixikutils'
+            
+            mods {
+                crafttweakersixikutils {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+
+            property 'forge.logging.console.level', 'debug'
+
+                        property 'forge.enabledGameTestNamespaces', 'crafttweakersixikutils'
+            
+            mods {
+                crafttweakersixikutils {
+                    source sourceSets.main
+                }
+            }
+        }
+
+
+        gameTestServer {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+
+            property 'forge.logging.console.level', 'debug'
+
+            property 'forge.enabledGameTestNamespaces', 'crafttweakersixikutils'
+
+            mods {
+                crafttweakersixikutils {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        data {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+
+            property 'forge.logging.console.level', 'debug'
+
+            args '--mod', 'crafttweakersixikutils', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+
+            mods {
+                crafttweakersixikutils {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+mixin {
+    add sourceSets.main, "crafttweakersixikutils.refmap.json"
+
+    config "crafttweakersixikutils.mixins.json"
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+repositories {
+    maven { // Forge
+        name 'ForgeFS'
+        url 'https://files.minecraftforge.net/maven'
+    }
+    maven {
+        name 'crafttweaker and jei'
+        url 'https://maven.blamejared.com'
+    }
+    maven {
+        name = "Curseforge" // Curseforge Maven
+        url = "https://www.cursemaven.com/"
+    }
+}
+
+dependencies {
+
+    minecraft 'net.minecraftforge:forge:1.19.2-43.2.14'
+
+    implementation fg.deobf("curse.maven:crafttweaker-239197:4546506")
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+
+//    implementation fg.deobf("curse.maven:kubejs-238086:4377175")
+//    implementation fg.deobf("curse.maven:rhino-416294:4476056")
+//    implementation fg.deobf("curse.maven:architectury-api-419699:4555749")
+}
+
+jar {
+    manifest {
+        attributes([
+                "Specification-Title": "crafttweakersixikutils",
+                            "Specification-Vendor": "sixik",
+                            "Specification-Version": "1", // We are version 1 of ourselves
+                "Implementation-Title": project.name,
+                "Implementation-Version": project.jar.archiveVersion,
+                            "Implementation-Vendor": "sixik",
+                            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+jar.finalizedBy('reobfJar')
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
